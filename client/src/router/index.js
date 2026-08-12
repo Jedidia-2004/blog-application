@@ -15,7 +15,12 @@ const router = createRouter({
     return { top: 0 };
   },
   routes: [
-    { path: "/", name: "home", component: Home },
+    {
+      path: "/",
+      alias: "/posts",
+      name: "home",
+      component: Home,
+    },
     {
       path: "/login",
       name: "login",
