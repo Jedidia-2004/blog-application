@@ -1,0 +1,33 @@
+{
+  "name": "blog-api-server",
+  "version": "1.0.0",
+  "description": "REST API for a MEVN blog application",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "check": "node --check index.js && node --check app.js && node --check controllers/authController.js && node --check controllers/postController.js"
+  },
+  "keywords": [
+    "blog",
+    "express",
+    "mongodb",
+    "mongoose",
+    "mevn"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

@@ -1,0 +1,7 @@
+body {
+  min-width: 320px;
+}
+
+.post-content {
+  white-space: pre-wrap;
+}
