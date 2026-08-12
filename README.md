@@ -60,6 +60,7 @@ Base URL: `http://localhost:4000`
 | `POST` | `/api/posts` | Logged-in user | Create a post |
 | `PUT/PATCH` | `/api/posts/:id` | Post owner | Update a post |
 | `DELETE` | `/api/posts/:id` | Post owner or admin | Delete a post |
+| `POST` | `/api/posts/:id/comments` | Logged-in user | Add a comment to a post |
 
 ### Checking API
 

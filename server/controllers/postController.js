@@ -32,10 +32,9 @@ const getPosts = asyncHandler(async (request, response) => {
 });
 
 const getPost = asyncHandler(async (request, response) => {
-  const post = await Post.findById(request.params.id).populate(
-    "author",
-    "username"
-  );
+  const post = await Post.findById(request.params.id)
+    .populate("author", "username")
+    .populate("comments.author", "username");
 
   if (!post) {
     return response.status(404).json({
@@ -45,6 +44,49 @@ const getPost = asyncHandler(async (request, response) => {
   }
 
   response.status(200).json({ success: true, post });
+});
+
+const addComment = asyncHandler(async (request, response) => {
+  const post = await Post.findById(request.params.id);
+
+  if (!post) {
+    return response.status(404).json({
+      success: false,
+      message: "Post not found.",
+    });
+  }
+
+  const content = request.body?.content;
+
+  if (typeof content !== "string" || !content.trim()) {
+    return response.status(400).json({
+      success: false,
+      message: "Comment is required.",
+    });
+  }
+
+  if (content.trim().length > 1000) {
+    return response.status(400).json({
+      success: false,
+      message: "Comment cannot exceed 1,000 characters.",
+    });
+  }
+
+  post.comments.push({
+    content: content.trim(),
+    author: request.user._id,
+  });
+
+  await post.save();
+  await post.populate("comments.author", "username");
+
+  const comment = post.comments[post.comments.length - 1];
+
+  response.status(201).json({
+    success: true,
+    message: "Comment posted successfully.",
+    comment,
+  });
 });
 
 const createPost = asyncHandler(async (request, response) => {
@@ -156,4 +198,11 @@ const deletePost = asyncHandler(async (request, response) => {
   });
 });
 
-module.exports = { getPosts, getPost, createPost, updatePost, deletePost };
+module.exports = {
+  getPosts,
+  getPost,
+  createPost,
+  updatePost,
+  deletePost,
+  addComment,
+};

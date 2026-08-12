@@ -66,6 +66,10 @@ export const postsApi = {
     const response = await api.delete(`/posts/${id}`);
     return response.data;
   },
+  async addComment(id, content) {
+    const response = await api.post(`/posts/${id}/comments`, { content });
+    return response.data;
+  },
 };
 
 export default api;

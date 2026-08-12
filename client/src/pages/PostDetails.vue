@@ -15,7 +15,10 @@ const userStore = useUserStore();
 const post = ref(null);
 const loading = ref(true);
 const deleting = ref(false);
+const commenting = ref(false);
+const commentContent = ref("");
 const error = ref("");
+const commentError = ref("");
 
 const authorId = computed(() =>
   String(post.value?.author?._id || post.value?.author || "")
@@ -53,6 +56,30 @@ async function deletePost() {
   } catch (requestError) {
     error.value = requestError.message;
     deleting.value = false;
+  }
+}
+
+async function submitComment() {
+  commentError.value = "";
+
+  if (!commentContent.value.trim()) {
+    commentError.value = "Please write a comment first.";
+    return;
+  }
+
+  commenting.value = true;
+
+  try {
+    const data = await postsApi.addComment(
+      post.value._id,
+      commentContent.value
+    );
+    post.value.comments.push(data.comment);
+    commentContent.value = "";
+  } catch (requestError) {
+    commentError.value = requestError.message;
+  } finally {
+    commenting.value = false;
   }
 }
 
@@ -102,6 +129,69 @@ watch(() => route.params.id, loadPost, { immediate: true });
           </div>
         </div>
       </div>
+
+      <section class="mt-4">
+        <h2 class="h4 mb-3">
+          Comments ({{ post.comments?.length || 0 }})
+        </h2>
+
+        <div v-if="userStore.isAuthenticated" class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <form @submit.prevent="submitComment">
+              <label class="form-label fw-semibold" for="comment">
+                Add a comment
+              </label>
+              <textarea
+                id="comment"
+                v-model="commentContent"
+                class="form-control"
+                rows="3"
+                maxlength="1000"
+                placeholder="Share your thoughts..."
+                :disabled="commenting"
+              ></textarea>
+              <div class="form-text text-end">
+                {{ commentContent.length }}/1000
+              </div>
+
+              <AlertMessage v-if="commentError" :message="commentError" />
+
+              <button
+                class="btn btn-primary mt-2"
+                type="submit"
+                :disabled="commenting || !commentContent.trim()"
+              >
+                {{ commenting ? "Posting..." : "Post comment" }}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div v-else class="alert alert-light border">
+          <RouterLink :to="{ name: 'login', query: { redirect: route.fullPath } }">
+            Log in
+          </RouterLink>
+          to post a comment.
+        </div>
+
+        <div v-if="post.comments?.length" class="d-grid gap-3">
+          <div
+            v-for="comment in post.comments"
+            :key="comment._id"
+            class="card border-0 shadow-sm"
+          >
+            <div class="card-body">
+              <div class="small text-secondary mb-2">
+                {{ comment.author?.username || "Unknown user" }} ·
+                {{ formatDate(comment.createdAt) }}
+              </div>
+              <div class="comment-content">{{ comment.content }}</div>
+            </div>
+          </div>
+        </div>
+
+        <p v-else class="text-secondary">No comments yet. Be the first to comment.</p>
+      </section>
     </div>
   </article>
 </template>

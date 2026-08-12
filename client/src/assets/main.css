@@ -2,6 +2,7 @@ body {
   min-width: 320px;
 }
 
-.post-content {
+.post-content,
+.comment-content {
   white-space: pre-wrap;
 }
